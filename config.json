@@ -1,0 +1,30 @@
+{
+  "channelsFile": "channels.txt",
+  "identity": {
+    "username": "jezelfy",
+    "password": "oauth:q1tlp3niaajut72iuxryw8kir1p5od",  // OAuth токен для бота
+    "clientId": "5pz5u1psvi5r8zhcv7panemrj45li0",          // Client ID от Twitch
+    "accessToken": "l1h2ke11naps8ib1q0jjbvpqkmxman"        // Текущий accessToken
+  },
+  "weather": {
+    "apiBaseUrl": "http://api.weatherstack.com/current",
+    "apiKey": "9b75b53ea3da6e8a975780bdff0cf209"           // API ключ для погоды
+  },
+  "lastfm": {
+    "apiKey": "e97eb158a75157f70f390007ee66f04c"            // API ключ для Last.fm
+  },
+  "prefix": "*",
+  "channels": [],                   
+                        // Сюда можно добавить каналы
+  "channelPrefixes": {},                                    // Персональные префиксы для каналов
+  "twitch": {
+    "accessToken": "l1h2ke11naps8ib1q0jjbvpqkmxman",        // OAuth токен для Twitch API
+    "gqlAccessToken": "l1h2ke11naps8ib1q0jjbvpqkmxman",     // GQL токен для GraphQL запросов
+    "channelName": "jezelfy"                                // Основной канал бота
+  },
+  "spotify": {
+    "clientId": "bc3fbe239150479ebc9fbb089f0077a8",         // Client ID для Spotify
+    "clientSecret": "0cd7a7e9a7434d54b12a8c78901a9fa1",     // Client Secret для Spotify
+    "tokenFilePath": "./spotify_token.json"                 // Путь к файлу с токеном Spotify
+  }
+}
