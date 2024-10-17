@@ -104,7 +104,7 @@ function changePrefix(channel, newPrefix, senderIsMod) {
 
 // Сохранение конфигурации в файл
 function saveConfigToFile() {
-    fs.writeFile(config.configPath, JSON.stringify(config, null, 4), (err) => {
+    fs.writeFile('./config.json', JSON.stringify(config, null, 4), (err) => {
         if (err) {
             console.error('Ошибка при сохранении файла конфигурации:', err);
         } else {
@@ -148,7 +148,7 @@ async function handlePingCommand(channel) {
         const ping = await client.ping();
         const endTime = Date.now();
         const totalPing = Math.round((endTime - startTime) / 1000);
-        const pingMessage = `● jezelfSmile Понг! ● Задержка: ${ping} мс (TMI) ${totalPing} с (Internal) ● Время работы: ${formatUptime(uptime)} ● Использование памяти: ${memoryUsage} ● Каналы: ${config.channels.length}`;
+        const pingMessage = `● jezelfSmile Понг! ● Задержка: ${ping} мс (TMI) ${totalPing} с (Internal) ● Время работы: ${formatUptime(uptime)} ● Использование памяти: ${memoryUsage} ● Температура CPU: ${temperature} ● Каналы: ${config.channels.length}`;
 
         sendMessage(channel, pingMessage);
     } catch (err) {
@@ -173,7 +173,7 @@ async function handleJoinCommand(channel, userstate, args) {
 
     try {
         if (config.channels.includes(targetChannel)) {
-            console.log(`Бот уже подключен к каналу ${targetChannel}`);
+            sendMessage(channel, `/me Бот уже подключен к каналу ${targetChannel}`);
             return;
         }
 
@@ -202,7 +202,7 @@ async function handlePartCommand(channel, userstate, args) {
 
     try {
         if (!config.channels.includes(targetChannel)) {
-            console.log(`Бот не подключен к каналу ${targetChannel}`);
+            sendMessage(channel, `/me Бот не подключен к каналу ${targetChannel}`);
             return;
         }
 
@@ -243,25 +243,16 @@ client.on('message', async (channel, userstate, message, self) => {
     console.log(`[${channel}] ${username}: ${message}`);
 
     // Получаем префикс для текущего канала или используем префикс по умолчанию
-    const currentPrefix = config.channelPrefixes[channel] || config.prefix;
+    const prefix = config.channelPrefixes[channel] || config.defaultPrefix;
 
-    // Проверяем, начинается ли сообщение с текущего префикса
-    if (!message.startsWith(currentPrefix)) return;
+    if (!message.startsWith(prefix)) return;
 
-    // Убираем префикс из сообщения и разделяем его на аргументы
-    const commandBody = message.slice(currentPrefix.length).trim();
-    const args = commandBody.split(/\s+/);
-    const command = args.shift().toLowerCase();
-
-    // Проверка на отключение команд, если это не JEZELFY
-    if (!commandsEnabled && username.toLowerCase() !== 'jezelfy') return;
+    const command = message.slice(prefix.length).trim().split(' ')[0].toLowerCase();
+    const args = message.slice(prefix.length + command.length).trim().split(' ');
 
     switch (command) {
-        case 'prefix':
-            handlePrefixCommand(channel, userstate, args);
-            break;
         case 'ping':
-            handlePingCommand(channel);
+            await handlePingCommand(channel);
             break;
         case 'uptime':
             handleUptimeCommand(channel);
@@ -272,10 +263,16 @@ client.on('message', async (channel, userstate, message, self) => {
         case 'part':
             handlePartCommand(channel, userstate, args);
             break;
+        case 'prefix':
+            handlePrefixCommand(channel, userstate, args);
+            break;
         default:
             console.log(`Неизвестная команда: ${command}`);
+            break;
     }
 });
 
-// Запуск клиента
-client.connect().catch(console.error);
+// Подключение к Twitch
+client.connect().catch(err => {
+    console.error(`Ошибка подключения: ${err}`);
+});
